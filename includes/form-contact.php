@@ -6,7 +6,28 @@
 
     add_action('add_meta_boxes','create_meta_box');
 
-    add_filter('')
+    // add_filter('manage_testplugin_posts_columns','create_testplugin_post_columns');
+
+    // add_action('manage_testplugin_posts_custom_column','create_testplugin_post_custom_column');
+
+// function create_testplugin_post_columns($columns){
+
+//     $columns = array(
+//         'cb' => $columns['cb'],
+//         'Name' => 'Name',
+//         'Email' => 'Email',
+//         'Password' => 'Password',
+//         'Text' => 'Text'
+//     );
+    
+//     return $columns;
+// }
+
+// function create_testplugin_post_custom_column($column,$post_id){
+
+
+// }
+
 
 function create_meta_box(){
     add_meta_box('custom_meta_box','Fields','display_meta_box','testplugin');
