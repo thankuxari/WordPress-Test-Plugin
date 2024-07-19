@@ -6,27 +6,44 @@
 
     add_action('add_meta_boxes','create_meta_box');
 
-    // add_filter('manage_testplugin_posts_columns','create_testplugin_post_columns');
+    add_filter('manage_testplugin_posts_columns','create_testplugin_post_columns');
 
-    // add_action('manage_testplugin_posts_custom_column','create_testplugin_post_custom_column');
+    add_action('manage_testplugin_posts_custom_column','create_testplugin_post_custom_column',10,2);
 
-// function create_testplugin_post_columns($columns){
+//Create the custom Columns on the Plugin Page
+function create_testplugin_post_columns($columns){
 
-//     $columns = array(
-//         'cb' => $columns['cb'],
-//         'Name' => 'Name',
-//         'Email' => 'Email',
-//         'Password' => 'Password',
-//         'Text' => 'Text'
-//     );
+    $columns = array(
+        'cb' => $columns['cb'],
+        'Name' => 'Name',
+        'Email' => 'Email',
+        'Password' => 'Password',
+        'Text' => 'Text',
+        'Date' => $columns['date']
+    );
     
-//     return $columns;
-// }
-
-// function create_testplugin_post_custom_column($column,$post_id){
+    return $columns;
+}
 
 
-// }
+//Fill the custom Columns on the Plugin Page
+function create_testplugin_post_custom_column($column,$post_id){
+
+    switch($column){
+        case 'Name' :
+            echo get_post_meta($post_id,'name',true);
+            break;
+        case 'Email' :
+            echo get_post_meta($post_id,'email',true);
+            break;
+        case 'Password' :
+            echo get_post_meta($post_id, 'password', true);
+            break;
+        case 'Text' :
+            echo get_post_meta($post_id, 'textarea', true);
+            break;
+    }
+}
 
 
 function create_meta_box(){
@@ -64,14 +81,19 @@ function create_rest_endpoint(){
 }
 
 function handle_api($request){
+    
     $parameters = $request->get_params();
-
 
     //Form Data
     $name = $parameters['name'];
     $email = $parameters['email'];
     $password = $parameters['password'];
     $text = $parameters['textarea'];
+
+    if(empty($name) || empty($email) || empty($password) || empty($text)){
+        return new WP_Error('rest_fields_missing','Please fill in all the fields',array(status=>500));
+    }
+    
 
     $response = array(
         'name' => $name,
@@ -87,12 +109,25 @@ function handle_api($request){
     );
 
 
-    //Insert all the data from the form to the backend of WordPress
     $post_id = wp_insert_post($postarr);
 
     foreach($parameters as $label => $value){
         add_post_meta($post_id,$label,$value);
     }
+
+
+    //Insert Form Data to the phpmyadmin database
+    global $wpdb;
+
+    $wpdb->insert(
+        $wpdb->prefix . 'testdata',
+        [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'textArea' => $text
+        ]
+    );
 
     return rest_ensure_response($response);
 }

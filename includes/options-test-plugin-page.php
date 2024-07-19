@@ -10,6 +10,7 @@ class optionsPage {
     {
         // Initialize the plugin hooks
         add_action('init', array($this, 'registerPostTypes'));
+        add_action('init',array($this,'remove_content_editor'));
     }
 
 
@@ -23,12 +24,15 @@ class optionsPage {
             'public' => true,
             'show_ui' => true,
             'menu_icon' => 'dashicons-media-text', 
-            'supports' => ['custom-fields'],
         ];
 
         register_post_type('testplugin', $args);
     }
 
+    //Remove the TextArea from the Edit Post Page
+    public function remove_content_editor(){
+        remove_post_type_support('testplugin', 'editor');        
+    }
 }
 
 $init = new optionsPage();

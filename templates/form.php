@@ -14,7 +14,6 @@
 
     form.addEventListener('submit',async(event)=>{
         event.preventDefault();
-
         const formData = new FormData(form);
         const data = {};
         formData.forEach((value, key) => {
@@ -35,9 +34,16 @@
 
                 const result = await response.json();
                 console.log(result);
-
+                const successMessage = document.createElement('p');
+                successMessage.textContent = 'Form Submitted';
+                successMessage.classList.add('succesMessage');
+                document.body.appendChild(successMessage);
             } catch (error) {
                 console.error(error);
+                const errorMessage = document.createElement('p');
+                errorMessage.textContent = 'There was an error while submitting the form';
+                errorMessage.classList.add('errorMessage');
+                document.body.appendChild(errorMessage);
             }
         })
 </script>
@@ -68,6 +74,16 @@
         padding:1em;
         border-radius: 1.2em;
         width: 75%;
+    }
+
+    .succesMessage{
+        width: 100%;
+        background-color: green;
+    }
+
+    .errorMessage{
+        width: 100%;
+        background-color: red;
     }
 </style>
 
